@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barbería Jadiel — Agenda tu Cita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:#0a0a0a; --surface:#1a1a1a; --card:#222222; --border:#2e2e2e;
+    --gold:#c9a84c; --gold-light:#e8c96a; --gold-dim:rgba(201,168,76,0.15);
+    --white:#f0ece4; --muted:#888880; --red:#e05c5c; --green:#5cba8a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(201,168,76,0.07) 0%,transparent 70%);pointer-events:none;z-index:0;}
+  .container{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:0 24px 80px;}
+  header{text-align:center;padding:52px 0 36px;}
+  header::after{content:'';display:block;width:50px;height:2px;background:var(--gold);margin:18px auto 0;}
+  .logo-icon{font-size:32px;margin-bottom:10px;display:block;filter:drop-shadow(0 0 18px rgba(201,168,76,0.4));}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:900;}
+  h1 span{color:var(--gold);}
+  .subtitle{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+  .steps{display:flex;justify-content:center;margin:0 0 36px;}
+  .step{display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color 0.3s;}
+  .step.active{color:var(--gold);}.step.done{color:var(--green);}
+  .step-num{width:24px;height:24px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.62rem;flex-shrink:0;transition:all 0.3s;}
+  .step.active .step-num{background:var(--gold);color:var(--black);border-color:var(--gold);}
+  .step.done .step-num{background:var(--green);color:var(--black);border-color:var(--green);}
+  .step-line{width:32px;height:1px;background:var(--border);margin:0 4px;}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px;margin-bottom:20px;display:none;animation:fadeUp 0.35s ease;}
+  .panel.active{display:block;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .panel-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin-bottom:5px;}
+  .panel-desc{font-size:0.83rem;color:var(--muted);margin-bottom:24px;}
+  .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;}
+  .svc{border:1px solid var(--border);border-radius:11px;padding:18px;cursor:pointer;transition:all 0.2s;background:var(--card);position:relative;overflow:hidden;}
+  .svc::before{content:'';position:absolute;inset:0;background:var(--gold-dim);opacity:0;transition:opacity 0.2s;}
+  .svc:hover::before,.svc.selected::before{opacity:1;}
+  .svc.selected{border-color:var(--gold);}
+  .svc.selected .chk{display:flex;}
+  .svc-emoji{font-size:22px;margin-bottom:8px;}
+  .svc-name{font-weight:500;font-size:0.88rem;margin-bottom:3px;}
+  .svc-price{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--gold);}
+  .svc-time{font-size:0.73rem;color:var(--muted);}
+  .chk{position:absolute;top:9px;right:9px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:var(--black);display:none;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .cal-month{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;}
+  .nav-btn{background:var(--card);border:1px solid var(--border);color:var(--white);width:34px;height:34px;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .nav-btn:hover{border-color:var(--gold);color:var(--gold);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+  .cal-hdr{text-align:center;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;color:var(--muted);padding:5px 0;text-transform:uppercase;}
+  .cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:7px;font-size:0.83rem;cursor:pointer;transition:all 0.2s;border:1px solid transparent;background:var(--card);}
+  .cal-day:hover:not(.dis):not(.empty){border-color:var(--gold);color:var(--gold);}
+  .cal-day.sel{background:var(--gold);color:var(--black);font-weight:700;}
+  .cal-day.today{border-color:var(--muted);}
+  .cal-day.dis{opacity:0.22;cursor:not-allowed;}
+  .cal-day.empty{background:transparent;cursor:default;}
+  .slots-title{font-family:'DM Mono',monospace;font-size:0.67rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px;}
+  .slots-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:7px;}
+  .slot{padding:9px;text-align:center;border:1px solid var(--border);border-radius:7px;background:var(--card);cursor:pointer;font-family:'DM Mono',monospace;font-size:0.8rem;transition:all 0.2s;}
+  .slot:hover:not(.taken){border-color:var(--gold);color:var(--gold);}
+  .slot.sel{background:var(--gold);color:var(--black);border-color:var(--gold);font-weight:500;}
+  .slot.taken{opacity:0.28;cursor:not-allowed;text-decoration:line-through;}
+  .form-row{margin-bottom:16px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  label{display:block;font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+  input,textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 14px;color:var(--white);font-family:'DM Sans',sans-serif;font-size:0.88rem;outline:none;transition:border-color 0.2s;}
+  input:focus,textarea:focus{border-color:var(--gold);}
+  textarea{resize:vertical;min-height:75px;}
+  input::placeholder,textarea::placeholder{color:var(--muted);}
+  .sum-box{background:var(--card);border:1px solid var(--gold);border-radius:11px;padding:22px;margin-bottom:20px;}
+  .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.86rem;}
+  .sum-row:last-child{border-bottom:none;}
+  .sum-lbl{color:var(--muted);}
+  .sum-val{font-weight:500;}
+  .sum-total .sum-val{font-family:'DM Mono',monospace;color:var(--gold);font-size:1.05rem;font-weight:700;}
+  .btn{background:var(--gold);color:var(--black);border:none;border-radius:9px;padding:13px 26px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s;width:100%;}
+  .btn:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 8px 20px rgba(201,168,76,0.22);}
+  .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;box-shadow:none;}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:9px;padding:11px 22px;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
+  .btn-ghost:hover{color:var(--white);border-color:var(--white);}
+  .btn-row{display:flex;gap:10px;margin-top:20px;}
+  .btn-row .btn{flex:1;}
+  .ai-wrap{margin-top:26px;}
+  .ai-tag{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .ai-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .ai-msgs{max-height:200px;overflow-y:auto;margin-bottom:10px;}
+  .ai-bubble{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 10px 10px 10px;padding:12px 16px;font-size:0.86rem;line-height:1.6;margin-bottom:10px;}
+  .usr-msg{text-align:right;margin-bottom:10px;}
+  .usr-msg span{display:inline-block;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);border-radius:10px 10px 0 10px;padding:9px 13px;font-size:0.83rem;max-width:82%;text-align:left;}
+  .ai-row{display:flex;gap:8px;}
+  .ai-row input{margin:0;flex:1;}
+  .ai-send{background:var(--gold);border:none;color:var(--black);width:42px;height:42px;border-radius:9px;cursor:pointer;font-size:1rem;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+  .ai-send:hover{background:var(--gold-light);}
+  .stars{display:flex;gap:8px;margin:16px 0;}
+  .star{font-size:26px;cursor:pointer;transition:transform 0.15s;filter:grayscale(1) opacity(0.4);}
+  .star.on{filter:none;transform:scale(1.15);}
+  .cancel-box{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:24px;margin-top:20px;}
+  .cancel-box h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px;}
+  .cancel-box p{font-size:0.82rem;color:var(--muted);margin-bottom:18px;line-height:1.6;}
+  .tab-bar{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:4px;margin-bottom:20px;}
+  .tab{flex:1;text-align:center;padding:9px;border-radius:6px;cursor:pointer;font-size:0.83rem;transition:all 0.2s;color:var(--muted);}
+  .tab.on{background:var(--gold);color:var(--black);font-weight:700;}
+  .ok-panel{text-align:center;padding:44px 32px;}
+  .ok-icon{width:74px;height:74px;border-radius:50%;background:rgba(92,186,138,0.12);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 20px;animation:pop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);}
+  @keyframes pop{from{transform:scale(0.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .ok-title{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;margin-bottom:8px;}
+  .ok-sub{color:var(--muted);font-size:0.86rem;margin-bottom:24px;line-height:1.7;}
+  .bdgs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;}
+  .bdg{display:inline-flex;align-items:center;gap:5px;border-radius:16px;padding:6px 12px;font-size:0.72rem;font-family:'DM Mono',monospace;}
+  .bdg.g{background:rgba(92,186,138,0.1);border:1px solid rgba(92,186,138,0.35);color:var(--green);}
+  .bdg.y{background:var(--gold-dim);border:1px solid rgba(201,168,76,0.3);color:var(--gold);}
+  .spin{width:15px;height:15px;border:2px solid rgba(0,0,0,0.25);border-top-color:var(--black);border-radius:50%;animation:sp 0.6s linear infinite;display:inline-block;vertical-align:middle;margin-right:5px;}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .footer{text-align:center;margin-top:32px;font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--border);letter-spacing:0.1em;}
+  .footer span{color:var(--gold);opacity:0.5;}
+  @media(max-width:580px){.panel{padding:22px 16px;}.services-grid{grid-template-columns:1fr 1fr;}.form-grid{grid-template-columns:1fr;}.step-label{display:none;}.step-line{width:18px;}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <span class="logo-icon">✂️</span>
+    <h1>Barbería <span>Jadiel</span></h1>
+    <p class="subtitle">Agenda tu cita · Confirmación instantánea</p>
+  </header>
+
+  <!-- API KEY BANNER -->
+  <div id="keyBanner" style="background:#1a1200;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:18px 20px;margin-bottom:24px;">
+    <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;">⚙️ Activar asistente IA (opcional)</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <input type="password" id="keyInput" placeholder="Ingresa tu API key de Anthropic (sk-ant-...)" style="flex:1;min-width:220px;background:#222;border:1px solid #2e2e2e;border-radius:8px;padding:10px 14px;color:#f0ece4;font-family:'DM Mono',monospace;font-size:0.75rem;outline:none;">
+      <button onclick="saveKey()" style="background:#c9a84c;color:#0a0a0a;border:none;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;">Activar</button>
+      <button onclick="clearKey()" style="background:transparent;color:#888;border:1px solid #2e2e2e;border-radius:8px;padding:10px 14px;cursor:pointer;">Limpiar</button>
+    </div>
+    <div id="keyOk" style="display:none;color:#5cba8a;font-size:0.78rem;margin-top:8px;">✓ Asistente IA activo</div>
+  </div>
+
+  <div class="steps">
+    <div class="step active" id="s1"><div class="step-num">1</div><span class="step-label">Servicio</span></div>
+    <div class="step-line"></div>
+    <div class="step" id="s2"><div class="step-num">2</div><span class="step-label">Fecha</span></div>
+    <div class="step-line"></div>
+    <div class="step" id="s3"><div class="step-num">3</div><span class="step-label">Datos</span></div>
+    <div class="step-line"></div>
+    <div class="step" id="s4"><div class="step-num">4</div><span class="step-label">Confirmar</span></div>
+  </div>
+
+  <!-- PASO 1 -->
+  <div class="panel active" id="p1">
+    <div class="panel-title">¿Qué servicio necesitas?</div>
+    <div class="panel-desc">Selecciona el servicio que deseas</div>
+    <div class="services-grid" id="svcGrid"></div>
+    <div class="ai-wrap">
+      <div class="ai-tag"><div class="ai-dot"></div>Asistente IA</div>
+      <div class="ai-msgs" id="aiBox"><div class="ai-bubble">¡Hola! 👋 ¿No sabes qué elegir? Cuéntame qué buscas y te ayudo.</div></div>
+      <div class="ai-row">
+        <input type="text" id="aiIn" placeholder="Ej: quiero corte y algo para la barba..." onkeypress="if(event.key==='Enter')askAI()">
+        <button class="ai-send" onclick="askAI()">↑</button>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn" id="btn1" onclick="goTo(2)" disabled>Continuar →</button></div>
+  </div>
+
+  <!-- PASO 2 -->
+  <div class="panel" id="p2">
+    <div class="panel-title">Elige fecha y horario</div>
+    <div class="panel-desc">Los horarios ocupados se bloquean en tiempo real</div>
+    <div class="cal-nav">
+      <button class="nav-btn" onclick="prevM()">‹</button>
+      <div class="cal-month" id="calTitle"></div>
+      <button class="nav-btn" onclick="nextM()">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div id="slotsWrap" style="display:none">
+      <div class="slots-title">Horarios disponibles</div>
+      <div class="slots-grid" id="slotsGrid"></div>
+    </div>
+    <div id="aiDateWrap" style="display:none;margin-top:20px;">
+      <div class="ai-tag"><div class="ai-dot"></div>Asistente IA</div>
+      <div class="ai-bubble" id="aiDateMsg">Analizando...</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goTo(1)">← Atrás</button>
+      <button class="btn" id="btn2" onclick="goTo(3)" disabled>Continuar →</button>
+    </div>
+  </div>
+
+  <!-- PASO 3 -->
+  <div class="panel" id="p3">
+    <div class="panel-title">Tus datos</div>
+    <div class="panel-desc">Para confirmar y enviarte el recordatorio</div>
+    <div class="form-grid">
+      <div class="form-row"><label>Nombre completo *</label><input type="text" id="fName" placeholder="Juan García" oninput="chk3()"></div>
+      <div class="form-row"><label>Correo electrónico *</label><input type="email" id="fEmail" placeholder="juan@correo.com" oninput="chk3()"></div>
+      <div class="form-row"><label>Teléfono *</label><input type="tel" id="fPhone" placeholder="+506 8888 8888" oninput="chk3()"></div>
+      <div class="form-row"><label>Cumpleaños (DD/MM)</label><input type="text" id="fBday" placeholder="15/06"></div>
+    </div>
+    <div class="form-row"><label>Notas para el barbero</label><textarea id="fNotes" placeholder="Ej: Fade bajo, con cera..."></textarea></div>
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="goTo(2)">← Atrás</button>
+      <button class="btn" id="btn3" onclick="goTo(4)" disabled>Ver resumen →</button>
+    </div>
+  </div>
+
+  <!-- PASO 4 -->
+  <div class="panel" id="p4">
+    <div class="panel-title">Confirma tu cita</div>
+    <div class="panel-desc">Revisa los detalles antes de agendar</div>
+    <div class="sum-box" id="sumBox"></div>
+    <div class="ai-bubble" style="margin-bottom:20px;">
+      <div style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">✦ BarberAI</div>
+      <span id="aiCfTxt">Preparando...</span>
+    </div>
+    <button class="btn" id="btnCf" onclick="confirmar()">✓ Confirmar y agendar</button>
+    <div style="margin-top:10px"><button class="btn-ghost" style="width:100%" onclick="goTo(3)">← Modificar datos</button></div>
+  </div>
+
+  <!-- ÉXITO -->
+  <div class="panel" id="pOk">
+    <div class="ok-panel">
+      <div class="ok-icon">✓</div>
+      <div class="ok-title">¡Cita confirmada!</div>
+      <p class="ok-sub" id="okMsg"></p>
+      <div class="bdgs">
+        <div class="bdg g">📅 Guardado en calendario</div>
+        <div class="bdg y">📧 Correo enviado</div>
+        <div class="bdg g">⏰ Recordatorio activo</div>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:22px;margin-bottom:20px;text-align:left;">
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:4px;">¿Cómo fue tu experiencia?</div>
+        <div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;">Tu opinión nos ayuda a mejorar</div>
+        <div class="stars" id="starsRow">
+          <span class="star" onclick="rateStar(1)">⭐</span>
+          <span class="star" onclick="rateStar(2)">⭐</span>
+          <span class="star" onclick="rateStar(3)">⭐</span>
+          <span class="star" onclick="rateStar(4)">⭐</span>
+          <span class="star" onclick="rateStar(5)">⭐</span>
+        </div>
+        <textarea id="srvComment" placeholder="Comentario opcional..." style="margin-bottom:10px;height:60px;"></textarea>
+        <button class="btn" id="btnSrv" onclick="envSurvey()" disabled>Enviar calificación</button>
+      </div>
+
+      <div class="cancel-box">
+        <h3>¿Necesitas cambiar algo?</h3>
+        <p>Ingresa tu correo y la fecha para cancelar tu cita.</p>
+        <div class="tab-bar">
+          <div class="tab on" onclick="swTab('cancel',this)">Cancelar</div>
+          <div class="tab" onclick="swTab('reagendar',this)">Reagendar</div>
+        </div>
+        <div id="tabC">
+          <div class="form-row"><label>Tu correo</label><input type="email" id="cEmail" placeholder="juan@correo.com"></div>
+          <div class="form-row"><label>Fecha de tu cita (DD/MM/AAAA)</label><input type="text" id="cFecha" placeholder="25/03/2026"></div>
+          <button class="btn" style="background:var(--red)" onclick="cancelCita(this)">Cancelar mi cita</button>
+        </div>
+        <div id="tabR" style="display:none">
+          <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px;">Cancela tu cita actual y agenda una nueva desde el inicio.</p>
+          <button class="btn" onclick="resetApp()">Agendar nueva cita</button>
+        </div>
+      </div>
+      <button class="btn-ghost" style="width:100%;margin-top:16px" onclick="resetApp()">← Agendar otra cita</button>
+    </div>
+  </div>
+
+  <div class="footer">Powered by <span>Velia</span> · Sistema de agendamiento inteligente</div>
+</div>
+
+<script>
+// ══════════════════════════════════
+// CONFIGURACIÓN — editar por cliente
+// ══════════════════════════════════
+var CFG = {
+  nombreNegocio: "Barbería Jadiel",
+  webAppUrl: "https://script.google.com/macros/s/AKfycbwkAtJirZahtttqMQGsz20NulJWXTGeEJ2ip8ZwGPN42m-EaL3UP-oNfxTTTCdkgcZ6/exec",
+  servicios: [
+    {emoji:"✂️", nombre:"Corte clásico",    precio:1500, tiempo:"45 min", mins:45},
+    {emoji:"🧔", nombre:"Arreglo de barba", precio:800,  tiempo:"30 min", mins:30},
+    {emoji:"💈", nombre:"Corte + Barba",    precio:2000, tiempo:"70 min", mins:70},
+    {emoji:"🪒", nombre:"Rasurado navaja",  precio:1200, tiempo:"40 min", mins:40},
+    {emoji:"💆", nombre:"Tratamiento",      precio:1800, tiempo:"50 min", mins:50},
+    {emoji:"👑", nombre:"VIP Completo",     precio:3500, tiempo:"100 min",mins:100},
+  ],
+  horarios: ["9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30",
+             "13:00","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"],
+};
+
+// ══════════════════════════════════
+// ESTADO
+// ══════════════════════════════════
+var ST = {
+  svc:null, fecha:null, hora:null,
+  nombre:"", email:"", phone:"", bday:"", notes:"",
+  rating:0, mes: new Date()
+};
+
+var DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
+             "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+// ══════════════════════════════════
+// API KEY
+// ══════════════════════════════════
+function getKey() { return localStorage.getItem("velia_key") || ""; }
+
+function saveKey() {
+  var k = document.getElementById("keyInput").value.trim();
+  if (!k.startsWith("sk-ant-")) { alert("API key inválida. Debe empezar con sk-ant-"); return; }
+  localStorage.setItem("velia_key", k);
+  document.getElementById("keyOk").style.display = "block";
+  document.getElementById("keyInput").value = "";
+  document.getElementById("keyInput").placeholder = "✓ API key guardada";
+}
+
+function clearKey() {
+  localStorage.removeItem("velia_key");
+  document.getElementById("keyOk").style.display = "none";
+  document.getElementById("keyInput").placeholder = "Ingresa tu API key de Anthropic (sk-ant-...)";
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function goTo(n) {
+  for (var i=1;i<=4;i++) {
+    document.getElementById("p"+i).classList.remove("active");
+    var s = document.getElementById("s"+i);
+    s.classList.remove("active","done");
+    if (i < n) s.classList.add("done");
+    else if (i === n) s.classList.add("active");
+  }
+  document.getElementById("p"+n).classList.add("active");
+  if (n===4) buildSummary();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ══════════════════════════════════
+// SERVICIOS
+// ══════════════════════════════════
+function renderServices() {
+  var g = document.getElementById("svcGrid");
+  g.innerHTML = "";
+  CFG.servicios.forEach(function(s) {
+    var d = document.createElement("div");
+    d.className = "svc";
+    d.innerHTML =
+      '<div class="chk">✓</div>' +
+      '<div class="svc-emoji">'+s.emoji+'</div>' +
+      '<div class="svc-name">'+s.nombre+'</div>' +
+      '<div class="svc-price">₡'+s.precio.toLocaleString()+'</div>' +
+      '<div class="svc-time">'+s.tiempo+'</div>';
+    (function(el, svc) {
+      el.addEventListener("click", function() {
+        document.querySelectorAll(".svc").forEach(function(x){x.classList.remove("selected");});
+        el.classList.add("selected");
+        ST.svc = svc;
+        document.getElementById("btn1").disabled = false;
+      });
+    })(d, s);
+    g.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════
+// CALENDARIO
+// ══════════════════════════════════
+function renderCal() {
+  var d = ST.mes;
+  document.getElementById("calTitle").textContent = MESES[d.getMonth()] + " " + d.getFullYear();
+  var g = document.getElementById("calGrid");
+  g.innerHTML = "";
+  DIAS.forEach(function(day) {
+    var h = document.createElement("div");
+    h.className = "cal-hdr";
+    h.textContent = day;
+    g.appendChild(h);
+  });
+  var first = new Date(d.getFullYear(), d.getMonth(), 1).getDay();
+  var total = new Date(d.getFullYear(), d.getMonth()+1, 0).getDate();
+  var today = new Date(); today.setHours(0,0,0,0);
+  for (var i=0;i<first;i++) {
+    var e = document.createElement("div");
+    e.className = "cal-day empty";
+    g.appendChild(e);
+  }
+  for (var i=1;i<=total;i++) {
+    var cell = document.createElement("div");
+    var date = new Date(d.getFullYear(), d.getMonth(), i);
+    cell.className = "cal-day";
+    cell.textContent = i;
+    if (date < today || date.getDay()===0) {
+      cell.classList.add("dis");
+    } else {
+      if (date.toDateString()===today.toDateString()) cell.classList.add("today");
+      if (ST.fecha && date.toDateString()===ST.fecha.toDateString()) cell.classList.add("sel");
+      (function(dt, c) {
+        c.addEventListener("click", function() { selDate(dt, c); });
+      })(date, cell);
+    }
+    g.appendChild(cell);
+  }
+}
+
+function prevM(){ ST.mes.setMonth(ST.mes.getMonth()-1); renderCal(); }
+function nextM(){ ST.mes.setMonth(ST.mes.getMonth()+1); renderCal(); }
+
+async function selDate(date, cell) {
+  document.querySelectorAll(".cal-day.sel").forEach(function(e){e.classList.remove("sel");});
+  cell.classList.add("sel");
+  ST.fecha = date; ST.hora = null;
+  document.getElementById("btn2").disabled = true;
+  document.getElementById("slotsWrap").style.display = "block";
+
+  var g = document.getElementById("slotsGrid");
+  g.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;grid-column:1/-1;padding:8px 0;">Consultando disponibilidad...</div>';
+
+  var yr = date.getFullYear();
+  var mo = String(date.getMonth()+1).padStart(2,"0");
+  var dy = String(date.getDate()).padStart(2,"0");
+  var fechaParam = yr+"-"+mo+"-"+dy;
+
+  var ocupados = [];
+  try {
+    var res = await fetch(CFG.webAppUrl + "?fecha=" + fechaParam);
+    if (res.ok) {
+      var data = await res.json();
+      ocupados = data.ocupados || [];
+    }
+  } catch(e) {
+    console.log("Calendar no disponible, mostrando todos los horarios");
+  }
+
+  renderSlots(ocupados);
+  aiDate();
+}
+
+function renderSlots(ocupados) {
+  var g = document.getElementById("slotsGrid");
+  g.innerHTML = "";
+  CFG.horarios.forEach(function(t) {
+    var div = document.createElement("div");
+    var taken = ocupados.indexOf(t) !== -1;
+    div.className = "slot" + (taken ? " taken" : "");
+    div.textContent = t + (taken ? " 🔒" : "");
+    if (!taken) {
+      (function(time, el) {
+        el.addEventListener("click", function() {
+          document.querySelectorAll(".slot.sel").forEach(function(x){x.classList.remove("sel");});
+          el.classList.add("sel");
+          ST.hora = time;
+          document.getElementById("btn2").disabled = false;
+        });
+      })(t, div);
+    }
+    g.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════
+// DATOS
+// ══════════════════════════════════
+function chk3() {
+  ST.nombre = document.getElementById("fName").value.trim();
+  ST.email  = document.getElementById("fEmail").value.trim();
+  ST.phone  = document.getElementById("fPhone").value.trim();
+  ST.bday   = document.getElementById("fBday").value.trim();
+  ST.notes  = document.getElementById("fNotes").value.trim();
+  document.getElementById("btn3").disabled = !(ST.nombre && ST.email && ST.phone);
+}
+
+// ══════════════════════════════════
+// RESUMEN
+// ══════════════════════════════════
+function buildSummary() {
+  var dateStr = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
+  document.getElementById("sumBox").innerHTML =
+    row("Servicio", ST.svc.nombre) + row("Fecha", dateStr) +
+    row("Hora", ST.hora+" hrs") + row("Duración", ST.svc.tiempo) +
+    row("Cliente", ST.nombre) + row("Correo", ST.email) +
+    '<div class="sum-row sum-total"><span class="sum-lbl">Total</span><span class="sum-val">₡'+ST.svc.precio.toLocaleString()+'</span></div>';
+  aiConfirm();
+}
+function row(l,v){ return '<div class="sum-row"><span class="sum-lbl">'+l+'</span><span class="sum-val">'+v+'</span></div>'; }
+
+// ══════════════════════════════════
+// CONFIRMAR → Apps Script
+// ══════════════════════════════════
+async function confirmar() {
+  var btn = document.getElementById("btnCf");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Agendando...';
+
+  var d = ST.fecha;
+  var fechaStr = String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+
+  // String manual encodeURIComponent — funciona con no-cors en Apps Script
+  var body =
+    "tipo=cita" +
+    "&fecha="      + encodeURIComponent(fechaStr) +
+    "&hora="       + encodeURIComponent(ST.hora) +
+    "&nombre="     + encodeURIComponent(ST.nombre) +
+    "&correo="     + encodeURIComponent(ST.email) +
+    "&telefono="   + encodeURIComponent(ST.phone) +
+    "&servicio="   + encodeURIComponent(ST.svc.nombre) +
+    "&precio="     + encodeURIComponent(ST.svc.precio) +
+    "&duracion="   + encodeURIComponent(ST.svc.mins) +
+    "&cumpleanos=" + encodeURIComponent(ST.bday  || "") +
+    "&notas="      + encodeURIComponent(ST.notes || "");
+
+  try {
+    await fetch(CFG.webAppUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body
+    });
+  } catch(e) { console.log("fetch:", e); }
+
+  document.getElementById("p4").classList.remove("active");
+  document.getElementById("pOk").classList.add("active");
+  document.getElementById("s4").classList.add("done");
+
+  var ds2 = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
+  document.getElementById("okMsg").innerHTML =
+    "<strong>"+ST.nombre+"</strong>, tu cita está confirmada para el <strong>"+ds2+"</strong> a las <strong>"+ST.hora+" hrs</strong>.<br><br>"+
+    "Recibirás confirmación en <strong>"+ST.email+"</strong> y un recordatorio el día anterior.";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ══════════════════════════════════
+// SURVEY
+// ══════════════════════════════════
+function rateStar(n) {
+  ST.rating = n;
+  document.querySelectorAll(".star").forEach(function(s,i){ s.classList.toggle("on", i<n); });
+  document.getElementById("btnSrv").disabled = false;
+}
+
+async function envSurvey() {
+  var btn = document.getElementById("btnSrv");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Enviando...';
+  var sb =
+    "tipo=calificacion" +
+    "&fecha="      + encodeURIComponent(new Date().toLocaleDateString("es-CR")) +
+    "&nombre="     + encodeURIComponent(ST.nombre) +
+    "&correo="     + encodeURIComponent(ST.email) +
+    "&puntaje="    + encodeURIComponent(ST.rating) +
+    "&comentario=" + encodeURIComponent(document.getElementById("srvComment").value.trim());
+  try {
+    await fetch(CFG.webAppUrl, {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: sb
+    });
+  } catch(e){}
+  btn.innerHTML = "✓ ¡Gracias!";
+  btn.style.background = "var(--green)";
+}
+
+// ══════════════════════════════════
+// CANCELAR
+// ══════════════════════════════════
+async function cancelCita(btn) {
+  var correo = document.getElementById("cEmail").value.trim();
+  var fecha  = document.getElementById("cFecha").value.trim();
+  if (!correo||!fecha) { alert("Por favor ingresa correo y fecha."); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Cancelando...';
+  var cb =
+    "tipo=cancelacion" +
+    "&correo=" + encodeURIComponent(correo) +
+    "&fecha="  + encodeURIComponent(fecha);
+  try {
+    await fetch(CFG.webAppUrl, {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: cb
+    });
+  } catch(e){}
+  btn.innerHTML = "✓ Cita cancelada";
+  btn.style.background = "var(--green)";
+}
+
+function swTab(t, el) {
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
+  el.classList.add("on");
+  document.getElementById("tabC").style.display = t==="cancel" ? "block":"none";
+  document.getElementById("tabR").style.display = t==="reagendar" ? "block":"none";
+}
+
+// ══════════════════════════════════
+// RESET
+// ══════════════════════════════════
+function resetApp() {
+  ST.svc=null; ST.fecha=null; ST.hora=null;
+  ST.nombre=""; ST.email=""; ST.phone=""; ST.bday=""; ST.notes=""; ST.rating=0;
+  document.getElementById("pOk").classList.remove("active");
+  document.getElementById("slotsWrap").style.display="none";
+  document.getElementById("aiDateWrap").style.display="none";
+  for(var i=1;i<=4;i++){
+    var s=document.getElementById("s"+i);
+    s.classList.remove("active","done");
+  }
+  document.getElementById("s1").classList.add("active");
+  document.getElementById("p1").classList.add("active");
+  document.getElementById("btn1").disabled=true;
+  renderServices();
+  renderCal();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// ══════════════════════════════════
+// IA
+// ══════════════════════════════════
+async function askAI() {
+  var key = getKey();
+  var inp = document.getElementById("aiIn");
+  var msg = inp.value.trim(); if(!msg) return;
+  inp.value="";
+  var box = document.getElementById("aiBox");
+  var um = document.createElement("div"); um.className="usr-msg";
+  um.innerHTML="<span>"+msg+"</span>"; box.appendChild(um);
+  var tp = document.createElement("div"); tp.className="ai-bubble";
+  tp.innerHTML='<span style="color:var(--muted);font-style:italic;">Escribiendo...</span>';
+  box.appendChild(tp); box.scrollTop=box.scrollHeight;
+
+  if (!key) { tp.textContent="Activa tu API key para usar el asistente IA."; return; }
+
+  var svcList = CFG.servicios.map(function(s){return s.nombre+" (₡"+s.precio.toLocaleString()+", "+s.tiempo+")";}).join(", ");
+  try {
+    var res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
+        system:"Eres el asistente de "+CFG.nombreNegocio+". Servicios: "+svcList+". Breve (2-3 oraciones), español.",
+        messages:[{role:"user",content:msg}]})
+    });
+    var data = await res.json();
+    tp.textContent = data.content&&data.content[0] ? data.content[0].text : "No pude procesar tu pregunta.";
+  } catch(e){ tp.textContent="Error al conectar con el asistente."; }
+  box.scrollTop=box.scrollHeight;
+}
+
+async function aiDate() {
+  var key = getKey();
+  document.getElementById("aiDateWrap").style.display="block";
+  var el = document.getElementById("aiDateMsg");
+  if (!key) { el.textContent="Agrega tu API key para activar el asistente."; return; }
+  el.textContent="Analizando...";
+  var ds = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
+  try {
+    var res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:150,
+        system:"Asistente de barbería. Breve, cálido, español, máx 2 oraciones.",
+        messages:[{role:"user",content:"Cliente eligió "+ST.svc.nombre+" para el "+ds+". Confirma y sugiere mañana o tarde."}]})
+    });
+    var data = await res.json();
+    el.textContent = data.content&&data.content[0] ? data.content[0].text : "¡Excelente elección para el "+ds+"!";
+  } catch(e){ el.textContent="¡Buena elección para el "+ds+"! Elige el horario que más te convenga."; }
+}
+
+async function aiConfirm() {
+  var key = getKey();
+  var el = document.getElementById("aiCfTxt");
+  if (!key) { el.textContent="¡Listo "+ST.nombre+"! Revisa y confirma tu cita. 🪒"; return; }
+  el.textContent="Preparando confirmación...";
+  var ds = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
+  try {
+    var res = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:150,
+        system:"Asistente de barbería. Profesional, cálido, español, máx 2 oraciones.",
+        messages:[{role:"user",content:ST.nombre+" quiere "+ST.svc.nombre+" el "+ds+" a las "+ST.hora+". Confirma brevemente."}]})
+    });
+    var data = await res.json();
+    el.textContent = data.content&&data.content[0] ? data.content[0].text : "¡Todo listo, "+ST.nombre+"! Confirma tu cita. 🪒";
+  } catch(e){ el.textContent="¡Listo "+ST.nombre+"! Revisa y confirma. 🪒"; }
+}
+
+// ══════════════════════════════════
+// ARRANCAR
+// ══════════════════════════════════
+if (getKey()) {
+  document.getElementById("keyOk").style.display = "block";
+  document.getElementById("keyInput").placeholder = "✓ API key guardada";
+}
+renderServices();
+renderCal();
+</script>
+</body>
+</html>
