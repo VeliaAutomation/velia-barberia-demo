@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Barbería Demo — Agenda tu Cita</title>
+<title>Barbería Jadiel — Agenda tu Cita</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -24,7 +24,7 @@
   .subtitle{font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
   .steps{display:flex;justify-content:center;margin:0 0 36px;}
   .step{display:flex;align-items:center;gap:7px;font-family:'DM Mono',monospace;font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color 0.3s;}
-  .step.active{color:var(--gold);} .step.done{color:var(--green);}
+  .step.active{color:var(--gold);}.step.done{color:var(--green);}
   .step-num{width:24px;height:24px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.62rem;flex-shrink:0;transition:all 0.3s;}
   .step.active .step-num{background:var(--gold);color:var(--black);border-color:var(--gold);}
   .step.done .step-num{background:var(--green);color:var(--black);border-color:var(--green);}
@@ -122,16 +122,18 @@
 </head>
 <body>
 <div class="container">
+
   <header>
-    <span class="logo-icon" id="bEmoji">✂️</span>
-    <h1 id="bName">Barbería <span>Demo</span></h1>
-    <p class="subtitle" id="bTag">Agenda tu cita · Confirmación instantánea</p>
+    <span class="logo-icon">✂️</span>
+    <h1>Barbería <span>Jadiel</span></h1>
+    <p class="subtitle">Agenda tu cita · Confirmación instantánea</p>
   </header>
 
+  <!-- API KEY BANNER -->
   <div id="keyBanner" style="background:#1a1200;border:1px solid rgba(201,168,76,0.4);border-radius:12px;padding:18px 20px;margin-bottom:24px;">
-    <div style="font-family:monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;">⚙️ Activar asistente IA</div>
+    <div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#c9a84c;margin-bottom:8px;">⚙️ Activar asistente IA (opcional)</div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-      <input type="password" id="keyInput" placeholder="Ingresa tu API key (sk-ant-...)" style="flex:1;min-width:220px;background:#222;border:1px solid #2e2e2e;border-radius:8px;padding:10px 14px;color:#f0ece4;font-family:monospace;font-size:0.75rem;outline:none;">
+      <input type="password" id="keyInput" placeholder="Ingresa tu API key de Anthropic (sk-ant-...)" style="flex:1;min-width:220px;background:#222;border:1px solid #2e2e2e;border-radius:8px;padding:10px 14px;color:#f0ece4;font-family:'DM Mono',monospace;font-size:0.75rem;outline:none;">
       <button onclick="saveKey()" style="background:#c9a84c;color:#0a0a0a;border:none;border-radius:8px;padding:10px 18px;font-weight:700;cursor:pointer;">Activar</button>
       <button onclick="clearKey()" style="background:transparent;color:#888;border:1px solid #2e2e2e;border-radius:8px;padding:10px 14px;cursor:pointer;">Limpiar</button>
     </div>
@@ -148,6 +150,7 @@
     <div class="step" id="s4"><div class="step-num">4</div><span class="step-label">Confirmar</span></div>
   </div>
 
+  <!-- PASO 1 -->
   <div class="panel active" id="p1">
     <div class="panel-title">¿Qué servicio necesitas?</div>
     <div class="panel-desc">Selecciona el servicio que deseas</div>
@@ -163,9 +166,10 @@
     <div class="btn-row"><button class="btn" id="btn1" onclick="goTo(2)" disabled>Continuar →</button></div>
   </div>
 
+  <!-- PASO 2 -->
   <div class="panel" id="p2">
     <div class="panel-title">Elige fecha y horario</div>
-    <div class="panel-desc">Los horarios ocupados se cargan en tiempo real</div>
+    <div class="panel-desc">Los horarios ocupados se bloquean en tiempo real</div>
     <div class="cal-nav">
       <button class="nav-btn" onclick="prevM()">‹</button>
       <div class="cal-month" id="calTitle"></div>
@@ -186,6 +190,7 @@
     </div>
   </div>
 
+  <!-- PASO 3 -->
   <div class="panel" id="p3">
     <div class="panel-title">Tus datos</div>
     <div class="panel-desc">Para confirmar y enviarte el recordatorio</div>
@@ -202,6 +207,7 @@
     </div>
   </div>
 
+  <!-- PASO 4 -->
   <div class="panel" id="p4">
     <div class="panel-title">Confirma tu cita</div>
     <div class="panel-desc">Revisa los detalles antes de agendar</div>
@@ -214,6 +220,7 @@
     <div style="margin-top:10px"><button class="btn-ghost" style="width:100%" onclick="goTo(3)">← Modificar datos</button></div>
   </div>
 
+  <!-- ÉXITO -->
   <div class="panel" id="pOk">
     <div class="ok-panel">
       <div class="ok-icon">✓</div>
@@ -224,6 +231,7 @@
         <div class="bdg y">📧 Correo enviado</div>
         <div class="bdg g">⏰ Recordatorio activo</div>
       </div>
+
       <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:22px;margin-bottom:20px;text-align:left;">
         <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:4px;">¿Cómo fue tu experiencia?</div>
         <div style="font-size:0.8rem;color:var(--muted);margin-bottom:10px;">Tu opinión nos ayuda a mejorar</div>
@@ -237,6 +245,7 @@
         <textarea id="srvComment" placeholder="Comentario opcional..." style="margin-bottom:10px;height:60px;"></textarea>
         <button class="btn" id="btnSrv" onclick="envSurvey()" disabled>Enviar calificación</button>
       </div>
+
       <div class="cancel-box">
         <h3>¿Necesitas cambiar algo?</h3>
         <p>Ingresa tu correo y la fecha para cancelar tu cita.</p>
@@ -262,13 +271,12 @@
 </div>
 
 <script>
-// ── CONFIG ──────────────────────────────────
-const CFG = {
-  nombreNegocio: "Barbería Demo",
-  tagline: "Agenda tu cita · Confirmación instantánea",
-  emoji: "✂️",
-  webAppUrl: "https://script.google.com/macros/s/AKfycbxGHENHfN2o8ncqjZ7nLgaXzGnIJCf_xDPfON9oZfy3NVQ_bCEUrw9wxhBnU0ufnk9d/exec",
-  get apiKey() { return localStorage.getItem("velia_key") || ""; },
+// ══════════════════════════════════
+// CONFIGURACIÓN — editar por cliente
+// ══════════════════════════════════
+var CFG = {
+  nombreNegocio: "Barbería Jadiel",
+  webAppUrl: "https://script.google.com/macros/s/AKfycbwkAtJirZahtttqMQGsz20NulJWXTGeEJ2ip8ZwGPN42m-EaL3UP-oNfxTTTCdkgcZ6/exec",
   servicios: [
     {emoji:"✂️", nombre:"Corte clásico",    precio:1500, tiempo:"45 min", mins:45},
     {emoji:"🧔", nombre:"Arreglo de barba", precio:800,  tiempo:"30 min", mins:30},
@@ -281,18 +289,42 @@ const CFG = {
              "13:00","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00"],
 };
 
-// ── ESTADO ──────────────────────────────────
-const ST = {
+// ══════════════════════════════════
+// ESTADO
+// ══════════════════════════════════
+var ST = {
   svc:null, fecha:null, hora:null,
   nombre:"", email:"", phone:"", bday:"", notes:"",
   rating:0, mes: new Date()
 };
 
-const DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
-const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
-               "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+var DIAS  = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+var MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
+             "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
-// ── NAVIGATION ──────────────────────────────
+// ══════════════════════════════════
+// API KEY
+// ══════════════════════════════════
+function getKey() { return localStorage.getItem("velia_key") || ""; }
+
+function saveKey() {
+  var k = document.getElementById("keyInput").value.trim();
+  if (!k.startsWith("sk-ant-")) { alert("API key inválida. Debe empezar con sk-ant-"); return; }
+  localStorage.setItem("velia_key", k);
+  document.getElementById("keyOk").style.display = "block";
+  document.getElementById("keyInput").value = "";
+  document.getElementById("keyInput").placeholder = "✓ API key guardada";
+}
+
+function clearKey() {
+  localStorage.removeItem("velia_key");
+  document.getElementById("keyOk").style.display = "none";
+  document.getElementById("keyInput").placeholder = "Ingresa tu API key de Anthropic (sk-ant-...)";
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
 function goTo(n) {
   for (var i=1;i<=4;i++) {
     document.getElementById("p"+i).classList.remove("active");
@@ -306,7 +338,9 @@ function goTo(n) {
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-// ── SERVICIOS ───────────────────────────────
+// ══════════════════════════════════
+// SERVICIOS
+// ══════════════════════════════════
 function renderServices() {
   var g = document.getElementById("svcGrid");
   g.innerHTML = "";
@@ -331,7 +365,9 @@ function renderServices() {
   });
 }
 
-// ── CALENDARIO ──────────────────────────────
+// ══════════════════════════════════
+// CALENDARIO
+// ══════════════════════════════════
 function renderCal() {
   var d = ST.mes;
   document.getElementById("calTitle").textContent = MESES[d.getMonth()] + " " + d.getFullYear();
@@ -369,8 +405,8 @@ function renderCal() {
   }
 }
 
-function prevM(){ST.mes.setMonth(ST.mes.getMonth()-1);renderCal();}
-function nextM(){ST.mes.setMonth(ST.mes.getMonth()+1);renderCal();}
+function prevM(){ ST.mes.setMonth(ST.mes.getMonth()-1); renderCal(); }
+function nextM(){ ST.mes.setMonth(ST.mes.getMonth()+1); renderCal(); }
 
 async function selDate(date, cell) {
   document.querySelectorAll(".cal-day.sel").forEach(function(e){e.classList.remove("sel");});
@@ -378,17 +414,26 @@ async function selDate(date, cell) {
   ST.fecha = date; ST.hora = null;
   document.getElementById("btn2").disabled = true;
   document.getElementById("slotsWrap").style.display = "block";
+
   var g = document.getElementById("slotsGrid");
   g.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;grid-column:1/-1;padding:8px 0;">Consultando disponibilidad...</div>';
+
   var yr = date.getFullYear();
   var mo = String(date.getMonth()+1).padStart(2,"0");
   var dy = String(date.getDate()).padStart(2,"0");
+  var fechaParam = yr+"-"+mo+"-"+dy;
+
   var ocupados = [];
   try {
-    var res = await fetch(CFG.webAppUrl + "?fecha=" + yr+"-"+mo+"-"+dy);
-    var data = await res.json();
-    ocupados = data.ocupados || [];
-  } catch(e) { console.log("cal:", e); }
+    var res = await fetch(CFG.webAppUrl + "?fecha=" + fechaParam);
+    if (res.ok) {
+      var data = await res.json();
+      ocupados = data.ocupados || [];
+    }
+  } catch(e) {
+    console.log("Calendar no disponible, mostrando todos los horarios");
+  }
+
   renderSlots(ocupados);
   aiDate();
 }
@@ -415,7 +460,9 @@ function renderSlots(ocupados) {
   });
 }
 
-// ── DATOS ────────────────────────────────────
+// ══════════════════════════════════
+// DATOS
+// ══════════════════════════════════
 function chk3() {
   ST.nombre = document.getElementById("fName").value.trim();
   ST.email  = document.getElementById("fEmail").value.trim();
@@ -425,7 +472,9 @@ function chk3() {
   document.getElementById("btn3").disabled = !(ST.nombre && ST.email && ST.phone);
 }
 
-// ── RESUMEN ──────────────────────────────────
+// ══════════════════════════════════
+// RESUMEN
+// ══════════════════════════════════
 function buildSummary() {
   var dateStr = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
   document.getElementById("sumBox").innerHTML =
@@ -435,30 +484,46 @@ function buildSummary() {
     '<div class="sum-row sum-total"><span class="sum-lbl">Total</span><span class="sum-val">₡'+ST.svc.precio.toLocaleString()+'</span></div>';
   aiConfirm();
 }
-function row(l,v){return '<div class="sum-row"><span class="sum-lbl">'+l+'</span><span class="sum-val">'+v+'</span></div>';}
+function row(l,v){ return '<div class="sum-row"><span class="sum-lbl">'+l+'</span><span class="sum-val">'+v+'</span></div>'; }
 
-// ── CONFIRMAR ────────────────────────────────
+// ══════════════════════════════════
+// CONFIRMAR → Apps Script
+// ══════════════════════════════════
 async function confirmar() {
   var btn = document.getElementById("btnCf");
   btn.disabled = true;
   btn.innerHTML = '<span class="spin"></span> Agendando...';
+
   var d = ST.fecha;
   var fechaStr = String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+
+  // String manual encodeURIComponent — funciona con no-cors en Apps Script
+  var body =
+    "tipo=cita" +
+    "&fecha="      + encodeURIComponent(fechaStr) +
+    "&hora="       + encodeURIComponent(ST.hora) +
+    "&nombre="     + encodeURIComponent(ST.nombre) +
+    "&correo="     + encodeURIComponent(ST.email) +
+    "&telefono="   + encodeURIComponent(ST.phone) +
+    "&servicio="   + encodeURIComponent(ST.svc.nombre) +
+    "&precio="     + encodeURIComponent(ST.svc.precio) +
+    "&duracion="   + encodeURIComponent(ST.svc.mins) +
+    "&cumpleanos=" + encodeURIComponent(ST.bday  || "") +
+    "&notas="      + encodeURIComponent(ST.notes || "");
+
   try {
     await fetch(CFG.webAppUrl, {
-      method:"POST", mode:"no-cors",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        tipo:"cita", fecha:fechaStr, hora:ST.hora,
-        nombre:ST.nombre, correo:ST.email, telefono:ST.phone,
-        servicio:ST.svc.nombre, precio:ST.svc.precio, duracion:ST.svc.mins,
-        cumpleanos:ST.bday||"", notas:ST.notes||""
-      })
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body
     });
-  } catch(e){console.log("Sheets:",e);}
+  } catch(e) { console.log("fetch:", e); }
+
   document.getElementById("p4").classList.remove("active");
   document.getElementById("pOk").classList.add("active");
   document.getElementById("s4").classList.add("done");
+
   var ds2 = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
   document.getElementById("okMsg").innerHTML =
     "<strong>"+ST.nombre+"</strong>, tu cita está confirmada para el <strong>"+ds2+"</strong> a las <strong>"+ST.hora+" hrs</strong>.<br><br>"+
@@ -466,39 +531,59 @@ async function confirmar() {
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-// ── SURVEY ───────────────────────────────────
+// ══════════════════════════════════
+// SURVEY
+// ══════════════════════════════════
 function rateStar(n) {
   ST.rating = n;
-  document.querySelectorAll(".star").forEach(function(s,i){s.classList.toggle("on",i<n);});
+  document.querySelectorAll(".star").forEach(function(s,i){ s.classList.toggle("on", i<n); });
   document.getElementById("btnSrv").disabled = false;
 }
+
 async function envSurvey() {
   var btn = document.getElementById("btnSrv");
   btn.disabled = true;
   btn.innerHTML = '<span class="spin"></span> Enviando...';
+  var sb =
+    "tipo=calificacion" +
+    "&fecha="      + encodeURIComponent(new Date().toLocaleDateString("es-CR")) +
+    "&nombre="     + encodeURIComponent(ST.nombre) +
+    "&correo="     + encodeURIComponent(ST.email) +
+    "&puntaje="    + encodeURIComponent(ST.rating) +
+    "&comentario=" + encodeURIComponent(document.getElementById("srvComment").value.trim());
   try {
-    await fetch(CFG.webAppUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({tipo:"calificacion",fecha:new Date().toLocaleDateString("es-CR"),
-        nombre:ST.nombre,correo:ST.email,puntaje:ST.rating,
-        comentario:document.getElementById("srvComment").value.trim()})});
+    await fetch(CFG.webAppUrl, {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: sb
+    });
   } catch(e){}
   btn.innerHTML = "✓ ¡Gracias!";
   btn.style.background = "var(--green)";
 }
 
-// ── CANCELAR ─────────────────────────────────
+// ══════════════════════════════════
+// CANCELAR
+// ══════════════════════════════════
 async function cancelCita(btn) {
   var correo = document.getElementById("cEmail").value.trim();
   var fecha  = document.getElementById("cFecha").value.trim();
-  if(!correo||!fecha){alert("Por favor ingresa correo y fecha.");return;}
-  btn.disabled=true;
-  btn.innerHTML='<span class="spin"></span> Cancelando...';
+  if (!correo||!fecha) { alert("Por favor ingresa correo y fecha."); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Cancelando...';
+  var cb =
+    "tipo=cancelacion" +
+    "&correo=" + encodeURIComponent(correo) +
+    "&fecha="  + encodeURIComponent(fecha);
   try {
-    await fetch(CFG.webAppUrl,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({tipo:"cancelacion",correo:correo,fecha:fecha})});
+    await fetch(CFG.webAppUrl, {
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/x-www-form-urlencoded"},
+      body: cb
+    });
   } catch(e){}
-  btn.innerHTML="✓ Cita cancelada";
-  btn.style.background="var(--green)";
+  btn.innerHTML = "✓ Cita cancelada";
+  btn.style.background = "var(--green)";
 }
 
 function swTab(t, el) {
@@ -508,10 +593,12 @@ function swTab(t, el) {
   document.getElementById("tabR").style.display = t==="reagendar" ? "block":"none";
 }
 
-// ── RESET ────────────────────────────────────
+// ══════════════════════════════════
+// RESET
+// ══════════════════════════════════
 function resetApp() {
-  ST.svc=null;ST.fecha=null;ST.hora=null;
-  ST.nombre="";ST.email="";ST.phone="";ST.bday="";ST.notes="";ST.rating=0;
+  ST.svc=null; ST.fecha=null; ST.hora=null;
+  ST.nombre=""; ST.email=""; ST.phone=""; ST.bday=""; ST.notes=""; ST.rating=0;
   document.getElementById("pOk").classList.remove("active");
   document.getElementById("slotsWrap").style.display="none";
   document.getElementById("aiDateWrap").style.display="none";
@@ -527,8 +614,11 @@ function resetApp() {
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-// ── IA ───────────────────────────────────────
+// ══════════════════════════════════
+// IA
+// ══════════════════════════════════
 async function askAI() {
+  var key = getKey();
   var inp = document.getElementById("aiIn");
   var msg = inp.value.trim(); if(!msg) return;
   inp.value="";
@@ -536,32 +626,37 @@ async function askAI() {
   var um = document.createElement("div"); um.className="usr-msg";
   um.innerHTML="<span>"+msg+"</span>"; box.appendChild(um);
   var tp = document.createElement("div"); tp.className="ai-bubble";
-  tp.innerHTML='<span style="color:var(--muted);font-style:italic;font-size:0.82rem">Escribiendo...</span>';
+  tp.innerHTML='<span style="color:var(--muted);font-style:italic;">Escribiendo...</span>';
   box.appendChild(tp); box.scrollTop=box.scrollHeight;
+
+  if (!key) { tp.textContent="Activa tu API key para usar el asistente IA."; return; }
+
   var svcList = CFG.servicios.map(function(s){return s.nombre+" (₡"+s.precio.toLocaleString()+", "+s.tiempo+")";}).join(", ");
   try {
     var res = await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
-      headers:{"Content-Type":"application/json","x-api-key":CFG.apiKey,"anthropic-version":"2023-06-01"},
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
       body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
         system:"Eres el asistente de "+CFG.nombreNegocio+". Servicios: "+svcList+". Breve (2-3 oraciones), español.",
         messages:[{role:"user",content:msg}]})
     });
     var data = await res.json();
     tp.textContent = data.content&&data.content[0] ? data.content[0].text : "No pude procesar tu pregunta.";
-  } catch(e){ tp.textContent="Activa tu API key para usar el asistente."; }
+  } catch(e){ tp.textContent="Error al conectar con el asistente."; }
   box.scrollTop=box.scrollHeight;
 }
 
 async function aiDate() {
+  var key = getKey();
   document.getElementById("aiDateWrap").style.display="block";
   var el = document.getElementById("aiDateMsg");
+  if (!key) { el.textContent="Agrega tu API key para activar el asistente."; return; }
   el.textContent="Analizando...";
   var ds = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
   try {
     var res = await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
-      headers:{"Content-Type":"application/json","x-api-key":CFG.apiKey,"anthropic-version":"2023-06-01"},
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
       body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:150,
         system:"Asistente de barbería. Breve, cálido, español, máx 2 oraciones.",
         messages:[{role:"user",content:"Cliente eligió "+ST.svc.nombre+" para el "+ds+". Confirma y sugiere mañana o tarde."}]})
@@ -572,13 +667,15 @@ async function aiDate() {
 }
 
 async function aiConfirm() {
+  var key = getKey();
   var el = document.getElementById("aiCfTxt");
+  if (!key) { el.textContent="¡Listo "+ST.nombre+"! Revisa y confirma tu cita. 🪒"; return; }
   el.textContent="Preparando confirmación...";
   var ds = ST.fecha.toLocaleDateString("es-CR",{weekday:"long",day:"numeric",month:"long"});
   try {
     var res = await fetch("https://api.anthropic.com/v1/messages",{
       method:"POST",
-      headers:{"Content-Type":"application/json","x-api-key":CFG.apiKey,"anthropic-version":"2023-06-01"},
+      headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01"},
       body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:150,
         system:"Asistente de barbería. Profesional, cálido, español, máx 2 oraciones.",
         messages:[{role:"user",content:ST.nombre+" quiere "+ST.svc.nombre+" el "+ds+" a las "+ST.hora+". Confirma brevemente."}]})
@@ -588,35 +685,15 @@ async function aiConfirm() {
   } catch(e){ el.textContent="¡Listo "+ST.nombre+"! Revisa y confirma. 🪒"; }
 }
 
-// ── ARRANCAR ─────────────────────────────────
-document.getElementById("bEmoji").textContent = CFG.emoji;
-document.getElementById("bTag").textContent   = CFG.tagline;
-renderServices();
-renderCal();
-
-function saveKey() {
-  var k = document.getElementById("keyInput").value.trim();
-  if (!k.startsWith("sk-ant-")) { alert("API key inválida."); return; }
-  localStorage.setItem("velia_key", k);
+// ══════════════════════════════════
+// ARRANCAR
+// ══════════════════════════════════
+if (getKey()) {
   document.getElementById("keyOk").style.display = "block";
-  document.getElementById("keyInput").value = "";
   document.getElementById("keyInput").placeholder = "✓ API key guardada";
 }
-function clearKey() {
-  localStorage.removeItem("velia_key");
-  document.getElementById("keyOk").style.display = "none";
-  document.getElementById("keyInput").placeholder = "Ingresa tu API key (sk-ant-...)";
-}
-
-// Check on load
-if (localStorage.getItem("velia_key")) {
-  document.addEventListener("DOMContentLoaded", function() {
-    var ok = document.getElementById("keyOk");
-    if (ok) { ok.style.display = "block"; }
-    var inp = document.getElementById("keyInput");
-    if (inp) { inp.placeholder = "✓ API key guardada"; }
-  });
-}
+renderServices();
+renderCal();
 </script>
 </body>
 </html>
